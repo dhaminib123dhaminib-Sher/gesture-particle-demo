@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gesture Particle Demo</title>
+<style>
+  body { margin: 0; background: black; overflow: hidden; }
+  canvas { display: block; }
+  #label {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 28px;
+    font-family: Arial;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div id="label">Press O / P / I</div>
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+const label = document.getElementById("label");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let size = 15;
+let shape = "circle";
+let color = "cyan";
+
+// many particles
+const particles = [];
+for (let i = 0; i < 200; i++) {
+  particles.push({
+    x: canvas.width / 2 + Math.random() * 300 - 150,
+    y: canvas.height / 2 + Math.random() * 300 - 150,
+    dx: Math.random() * 2 - 1,
+    dy: Math.random() * 2 - 1
+  });
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "o") {
+    size += 10;
+    color = "lime";
+    label.innerText = "OPEN PALM → EXPAND";
+  }
+  if (e.key === "p") {
+    size = Math.max(5, size - 10);
+    color = "red";
+    label.innerText = "PINCH → CONTRACT";
+  }
+  if (e.key === "i") {
+    shape = shape === "circle" ? "heart" : "circle";
+    color = "yellow";
+    label.innerText = "INDEX UP → SHAPE CHANGE";
+  }
+});
+
+function drawHeart(x, y, s) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.bezierCurveTo(x - s, y - s, x - 2*s, y + s, x, y + 2*s);
+  ctx.bezierCurveTo(x + 2*s, y + s, x + s, y - s, x, y);
+  ctx.fill();
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = color;
+
+  particles.forEach(p => {
+    p.x += p.dx;
+    p.y += p.dy;
+
+    if (shape === "circle") {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      drawHeart(p.x, p.y, size);
+    }
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>
